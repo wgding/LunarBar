@@ -50,6 +50,7 @@ enum Localized {
     static let menuTitleScaleDefault = String(localized: "Default", comment: "[Menu] Content scale: default")
     static let menuTitleScaleCompact = String(localized: "Compact", comment: "[Menu] Content scale: compact")
     static let menuTitleScaleRoomy = String(localized: "Roomy", comment: "[Menu] Content scale: roomy")
+    static let menuTitleScaleGrand = String(localized: "Grand", comment: "[Menu] Content scale: grand")
     static let menuTitleReduceMotion = String(localized: "Reduce Motion", comment: "[Menu] Disable animations when presenting the calendar popover")
     static let menuTitleReduceTransparency = String(localized: "Reduce Transparency", comment: "[Menu] Reduce transparency of the calendar panel")
     static let menuTitlePinOnTop = String(localized: "Pin on Top", comment: "[Menu] Pin the popover on top")
@@ -95,6 +96,7 @@ enum Localized {
     static let holidayLabel = String(localized: "Holiday", comment: "Label for holidays")
     static let allDayLabel = String(localized: "all-day", comment: "Label for an all-day event")
     static let daysBetweenTemplate = String(localized: "%@ and %@ are %d day apart.", comment: "Template string used to show the distance between two dates")
+    static let isoWeekFormat = String(localized: "Week %lld", comment: "[Header] ISO-8601 week number shown next to the month, e.g., Week 37")
 
     /// https://en.wikipedia.org/wiki/Solar_term
     static let solarTerms = [

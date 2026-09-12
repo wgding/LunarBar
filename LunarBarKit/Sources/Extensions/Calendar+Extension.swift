@@ -48,6 +48,13 @@ public extension Calendar {
   /// Returns a lunar calendar, basically the Chinese calendar.
   static let lunar = Self(identifier: .chinese)
 
+  /// ISO-8601 calendar: weeks start on Monday, week 1 contains the first Thursday.
+  static var iso8601: Calendar {
+    var calendar = Calendar(identifier: .iso8601)
+    calendar.timeZone = .autoupdatingCurrent
+    return calendar
+  }
+
   /**
    In most calendars, this should be just 7, but this is not always true.
    */
@@ -74,6 +81,22 @@ public extension Calendar {
    */
   var orderedWeekdaySymbols: [String] {
     orderedWeekdaySymbols(standaloneWeekdaySymbols)
+  }
+
+  /**
+   Always Chinese short weekday symbols, taking **firstWeekday** into account.
+
+   Example: 一 二 三 四 五 六 日 when the week starts on Monday.
+   */
+  var orderedChineseShortWeekdaySymbols: [String] {
+    orderedWeekdaySymbols(["日", "一", "二", "三", "四", "五", "六"])
+  }
+
+  /**
+   Always Chinese weekday names, taking **firstWeekday** into account.
+   */
+  var orderedChineseWeekdaySymbols: [String] {
+    orderedWeekdaySymbols(["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"])
   }
 
   /**

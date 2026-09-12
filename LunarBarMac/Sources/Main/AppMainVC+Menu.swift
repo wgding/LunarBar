@@ -260,6 +260,7 @@ private extension AppMainVC {
       (Localized.UI.menuTitleScaleDefault, ContentScale.default),
       (Localized.UI.menuTitleScaleCompact, ContentScale.compact),
       (Localized.UI.menuTitleScaleRoomy, ContentScale.roomy),
+      (Localized.UI.menuTitleScaleGrand, ContentScale.grand),
     ].forEach { (title: String, scale: ContentScale) in
       menu.addItem(withTitle: title) { [weak self] in
         AppPreferences.General.contentScale = scale

@@ -110,6 +110,7 @@ enum ContentScale: Double, Codable {
   case `default` = 1.0
   case compact = 0.9
   case roomy = 1.1
+  case grand = 1.25
 }
 
 /// Foundation weekday numbering: Sunday = 1, Monday = 2.

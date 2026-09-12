@@ -1589,6 +1589,23 @@
         }
       }
     },
+    "Grand" : {
+      "comment" : "[Menu] Content scale: grand",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大气"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大氣"
+          }
+        }
+      }
+    },
     "Guyu" : {
       "comment" : "The 6th solar term, always in Chinese",
       "localizations" : {
@@ -2893,6 +2910,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天"
+          }
+        }
+      }
+    },
+    "Week %lld" : {
+      "comment" : "[Header] ISO-8601 week number shown next to the month, e.g., Week 37",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第%lld周"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第%lld週"
           }
         }
       }

@@ -128,6 +128,38 @@ final class CalendarTests: XCTestCase {
     XCTAssertEqual(Calendar.solar.component(.weekday, from: mondayStart), 2)
   }
 
+  func testOrderedChineseShortWeekdaySymbols() {
+    var mondayFirst = Calendar.solar
+    mondayFirst.firstWeekday = 2
+    XCTAssertEqual(mondayFirst.orderedChineseShortWeekdaySymbols, ["一", "二", "三", "四", "五", "六", "日"])
+
+    var sundayFirst = Calendar.solar
+    sundayFirst.firstWeekday = 1
+    XCTAssertEqual(sundayFirst.orderedChineseShortWeekdaySymbols, ["日", "一", "二", "三", "四", "五", "六"])
+  }
+
+  func testISOWeekOfYear() {
+    var components = DateComponents()
+    components.year = 2021
+    components.month = 1
+    components.day = 1
+
+    guard let week53 = Calendar.solar.date(from: components) else {
+      return XCTFail("Failed to create 2021-01-01")
+    }
+
+    // 2021-01-01 is Friday, ISO week 53 of 2020
+    XCTAssertEqual(Calendar.iso8601.component(.weekOfYear, from: week53), 53)
+
+    components.day = 4
+    guard let week1 = Calendar.solar.date(from: components) else {
+      return XCTFail("Failed to create 2021-01-04")
+    }
+
+    // 2021-01-04 is Monday, ISO week 1 of 2021
+    XCTAssertEqual(Calendar.iso8601.component(.weekOfYear, from: week1), 1)
+  }
+
   func testIsLastDayOfYear() {
     var components = DateComponents()
     components.year = 2024

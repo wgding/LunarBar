@@ -19,7 +19,7 @@ protocol HeaderViewDelegate: AnyObject {
 /**
  Calendar header, showing the date and a few buttons for navigation.
 
- Example: [ Dec 2023    < O > ]
+ Example: [ Dec 2023  Week 50    < O > ]
  */
 final class HeaderView: NSView {
   weak var delegate: HeaderViewDelegate?
@@ -28,6 +28,16 @@ final class HeaderView: NSView {
     let label = TextLabel()
     label.textColor = Colors.primaryLabel
     label.font = .monospacedDigitSystemFont(ofSize: Constants.dateFontSize, weight: .medium)
+
+    return label
+  }()
+
+  private let weekLabel: TextLabel = {
+    let label = TextLabel()
+    label.textColor = Colors.primaryLabel
+    label.alphaValue = AlphaLevels.secondary
+    label.font = .monospacedDigitSystemFont(ofSize: Constants.weekFontSize, weight: .medium)
+    label.setAccessibilityElement(true)
 
     return label
   }()
@@ -96,6 +106,11 @@ final class HeaderView: NSView {
       dateLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.datePadding),
       dateLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
     ])
+    dateLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+
+    weekLabel.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(weekLabel)
+    weekLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
     nextButton.translatesAutoresizingMaskIntoConstraints = false
     addSubview(nextButton)
@@ -123,6 +138,12 @@ final class HeaderView: NSView {
       previousButton.widthAnchor.constraint(equalToConstant: previousButton.frame.width),
       previousButton.heightAnchor.constraint(equalToConstant: previousButton.frame.height),
     ])
+
+    NSLayoutConstraint.activate([
+      weekLabel.leadingAnchor.constraint(equalTo: dateLabel.trailingAnchor, constant: Constants.weekPadding),
+      weekLabel.firstBaselineAnchor.constraint(equalTo: dateLabel.firstBaselineAnchor),
+      weekLabel.trailingAnchor.constraint(lessThanOrEqualTo: previousButton.leadingAnchor, constant: -Constants.datePadding),
+    ])
   }
 
   @available(*, unavailable)
@@ -133,8 +154,8 @@ final class HeaderView: NSView {
   override func mouseUp(with event: NSEvent) {
     super.mouseUp(with: event)
 
-    // Hidden way to goto today
-    if dateLabel.frame.contains(convert(event.locationInWindow, from: nil)) {
+    let location = convert(event.locationInWindow, from: nil)
+    if dateLabel.frame.contains(location) || weekLabel.frame.contains(location) {
       delegate?.headerView(self, moveTo: .now)
     }
   }
@@ -152,16 +173,21 @@ extension HeaderView {
   func updateCalendar(date: Date) {
     dateLabel.stringValue = Constants.dateFormatter.string(from: date)
 
+    let isoWeek = Calendar.iso8601.component(.weekOfYear, from: date)
+    weekLabel.stringValue = String.localizedStringWithFormat(Localized.Calendar.isoWeekFormat, isoWeek)
+
     if !AppPreferences.Accessibility.reduceMotion, previousDate != .distantPast,
        !Calendar.solar.isDate(previousDate, inSameMonthAs: date) {
-      let transition = CATransition()
-      transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-      transition.type = .push
-      transition.subtype = previousDate < date ? .fromBottom : .fromTop
-      transition.duration = 0.25
+      [dateLabel, weekLabel].forEach { label in
+        let transition = CATransition()
+        transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        transition.type = .push
+        transition.subtype = previousDate < date ? .fromBottom : .fromTop
+        transition.duration = 0.25
 
-      dateLabel.wantsLayer = true
-      dateLabel.layer?.add(transition, forKey: "pushEffect")
+        label.wantsLayer = true
+        label.layer?.add(transition, forKey: "pushEffect")
+      }
     }
 
     previousDate = date
@@ -193,7 +219,9 @@ extension HeaderView {
 private extension HeaderView {
   enum Constants {
     static let dateFontSize: Double = FontSizes.large
+    static let weekFontSize: Double = 12
     static let datePadding: Double = 9
+    static let weekPadding: Double = 6
     static let buttonPadding: Double = 6
     static let dateFormatter: DateFormatter = .localizedMonth
   }

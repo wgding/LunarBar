@@ -12,7 +12,7 @@ import LunarBarKit
 /**
  Weekday symbols, showing the shortest representation of each weekday.
 
- Example: [ S M T W T F S ]
+ Example: [ 日 一 二 三 四 五 六 ]
  */
 final class WeekdayView: NSStackView {
   init() {
@@ -28,8 +28,8 @@ final class WeekdayView: NSStackView {
   }
 
   func reloadSymbols() {
-    let shortSymbols = Calendar.solar.orderedVeryShortWeekdaySymbols
-    let fullSymbols = Calendar.solar.orderedWeekdaySymbols
+    let shortSymbols = Calendar.solar.orderedChineseShortWeekdaySymbols
+    let fullSymbols = Calendar.solar.orderedChineseWeekdaySymbols
     let weekendIndices = Calendar.solar.weekendIndices
 
     Logger.assert(shortSymbols.count == fullSymbols.count, "Invalid weekday symbols")
