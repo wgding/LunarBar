@@ -51,6 +51,17 @@ enum AppPreferences {
         HolidayManager.default.defaultsEnabled = defaultHolidays
       }
     }
+
+    @Storage(key: "calendar.first-weekday", defaultValue: .monday)
+    static var firstWeekday: FirstWeekday {
+      didSet {
+        applyFirstWeekday()
+      }
+    }
+
+    static func applyFirstWeekday() {
+      SolarCalendarConfig.firstWeekday = firstWeekday.rawValue
+    }
   }
 
   enum Accessibility {
@@ -98,6 +109,12 @@ enum ContentScale: Double, Codable {
   case `default` = 1.0
   case compact = 0.9
   case roomy = 1.1
+}
+
+/// Foundation weekday numbering: Sunday = 1, Monday = 2.
+enum FirstWeekday: Int, Codable {
+  case sunday = 1
+  case monday = 2
 }
 
 @MainActor

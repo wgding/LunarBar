@@ -1515,6 +1515,23 @@
         }
       }
     },
+    "First Day of Week" : {
+      "comment" : "[Menu] Section title for the first day of the week",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一周的第一天"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一週的第一天"
+          }
+        }
+      }
+    },
     "Ghost Festival" : {
       "comment" : "Chinese traditional festival",
       "localizations" : {
@@ -1986,6 +2003,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "中秋"
+          }
+        }
+      }
+    },
+    "Monday" : {
+      "comment" : "[Menu] Start the week on Monday",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周一"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週一"
           }
         }
       }
@@ -2791,6 +2825,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "春節"
+          }
+        }
+      }
+    },
+    "Sunday" : {
+      "comment" : "[Menu] Start the week on Sunday",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "周日"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "週日"
           }
         }
       }

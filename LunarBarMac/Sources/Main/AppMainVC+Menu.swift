@@ -276,6 +276,21 @@ private extension AppMainVC {
 
     menu.addSeparator()
 
+    // First day of week
+    menu.addItem(withTitle: Localized.UI.menuTitleFirstDayOfWeek).isEnabled = false
+    [
+      (Localized.UI.menuTitleWeekStartsMonday, FirstWeekday.monday),
+      (Localized.UI.menuTitleWeekStartsSunday, FirstWeekday.sunday),
+    ].forEach { (title: String, firstWeekday: FirstWeekday) in
+      menu.addItem(withTitle: title) { [weak self] in
+        AppPreferences.Calendar.firstWeekday = firstWeekday
+        self?.reloadCalendar()
+      }
+      .setOn(AppPreferences.Calendar.firstWeekday == firstWeekday)
+    }
+
+    menu.addSeparator()
+
     // Accessibility options
     menu.addItem(withTitle: Localized.UI.menuTitleReduceMotion) { [weak self] in
       AppPreferences.Accessibility.reduceMotion.toggle()

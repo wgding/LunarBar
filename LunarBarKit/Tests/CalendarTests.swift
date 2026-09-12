@@ -98,6 +98,36 @@ final class CalendarTests: XCTestCase {
     XCTAssertEqual(Calendar.solar.component(.day, from: endOfMonth), 29)
   }
 
+  func testSolarCalendarConfigOverridesFirstWeekday() {
+    let original = SolarCalendarConfig.firstWeekday
+    defer { SolarCalendarConfig.firstWeekday = original }
+
+    SolarCalendarConfig.firstWeekday = 1
+    XCTAssertEqual(Calendar.solar.firstWeekday, 1)
+
+    SolarCalendarConfig.firstWeekday = 2
+    XCTAssertEqual(Calendar.solar.firstWeekday, 2)
+  }
+
+  func testSolarCalendarConfigChangesFilledMonthStart() {
+    let original = SolarCalendarConfig.firstWeekday
+    defer { SolarCalendarConfig.firstWeekday = original }
+
+    var components = DateComponents()
+    components.year = 2024
+    components.month = 2
+    components.day = 10
+    let monthDate = Calendar.solar.date(from: components) ?? .now
+
+    SolarCalendarConfig.firstWeekday = 1
+    let sundayStart = Calendar.solar.allDatesFillingMonth(from: monthDate)?.first ?? .now
+    XCTAssertEqual(Calendar.solar.component(.weekday, from: sundayStart), 1)
+
+    SolarCalendarConfig.firstWeekday = 2
+    let mondayStart = Calendar.solar.allDatesFillingMonth(from: monthDate)?.first ?? .now
+    XCTAssertEqual(Calendar.solar.component(.weekday, from: mondayStart), 2)
+  }
+
   func testIsLastDayOfYear() {
     var components = DateComponents()
     components.year = 2024

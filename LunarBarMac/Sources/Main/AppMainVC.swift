@@ -79,6 +79,7 @@ extension AppMainVC {
     let lunarInfo = LunarCalendar.default.info(of: solarYear)
 
     headerView.updateCalendar(date: targetDate)
+    weekdayView.reloadSymbols()
     dateGridView.updateCalendar(date: targetDate, lunarInfo: lunarInfo)
   }
 

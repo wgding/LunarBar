@@ -5,6 +5,22 @@
 //
 
 import Foundation
+import os
+
+/**
+ Override for `Calendar.solar.firstWeekday`.
+
+ Foundation numbering: Sunday = 1, Monday = 2.
+ When `nil`, the system calendar's first weekday is used.
+ */
+public enum SolarCalendarConfig: Sendable {
+  private static let lock = OSAllocatedUnfairLock<Int?>(initialState: nil)
+
+  public static var firstWeekday: Int? {
+    get { lock.withLock { $0 } }
+    set { lock.withLock { $0 = newValue } }
+  }
+}
 
 public extension Calendar {
   /// Returns a gregorian calendar, use Calendar.autoupdatingCurrent when possible.
@@ -14,13 +30,19 @@ public extension Calendar {
   /// the reason is that the first weekday of a calendar can be customized.
   static var solar: Calendar {
     let current = autoupdatingCurrent
+    var calendar: Calendar
     if current.identifier == .gregorian {
-      return current
+      calendar = current
+    } else {
+      calendar = Calendar(identifier: .gregorian)
+      calendar.firstWeekday = current.firstWeekday
     }
 
-    var gregorian = Calendar(identifier: .gregorian)
-    gregorian.firstWeekday = current.firstWeekday
-    return gregorian
+    if let firstWeekday = SolarCalendarConfig.firstWeekday {
+      calendar.firstWeekday = firstWeekday
+    }
+
+    return calendar
   }
 
   /// Returns a lunar calendar, basically the Chinese calendar.

@@ -26,6 +26,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // We rely on tooltips to display information, change the initial delay to 1s to be faster
     UserDefaults.standard.set(1000, forKey: "NSInitialToolTipDelay")
 
+    AppPreferences.Calendar.applyFirstWeekday()
+
     // Prepare public holiday data
     _ = HolidayManager.default
 

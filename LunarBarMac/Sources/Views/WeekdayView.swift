@@ -24,6 +24,10 @@ final class WeekdayView: NSStackView {
     setAccessibilityRole(.group)
     setAccessibilityLabel(Localized.UI.accessibilityWeekdayArea)
 
+    reloadSymbols()
+  }
+
+  func reloadSymbols() {
     let shortSymbols = Calendar.solar.orderedVeryShortWeekdaySymbols
     let fullSymbols = Calendar.solar.orderedWeekdaySymbols
     let weekendIndices = Calendar.solar.weekendIndices
@@ -31,16 +35,39 @@ final class WeekdayView: NSStackView {
     Logger.assert(shortSymbols.count == fullSymbols.count, "Invalid weekday symbols")
     Logger.assert(weekendIndices.count == 2, "Invalid weekend indices")
 
+    if arrangedSubviews.count == shortSymbols.count {
+      for index in 0..<shortSymbols.count {
+        guard let label = arrangedSubviews[index] as? TextLabel else {
+          Logger.assertFail("Unexpected weekday view at index: \(index)")
+          continue
+        }
+
+        applySymbol(
+          to: label,
+          index: index,
+          shortSymbols: shortSymbols,
+          fullSymbols: fullSymbols,
+          weekendIndices: weekendIndices
+        )
+      }
+
+      return
+    }
+
+    arrangedSubviews.forEach { $0.removeFromSuperview() }
+
     for index in 0..<shortSymbols.count {
       let label = TextLabel()
       label.alignment = .center
       label.textColor = Colors.primaryLabel
       label.font = .mediumSystemFont(ofSize: Constants.fontSize)
-      label.stringValue = shortSymbols[index]
-
-      label.alphaValue = weekendIndices.contains(index) ? AlphaLevels.secondary : AlphaLevels.primary
-      label.setAccessibilityLabel(fullSymbols[index])
-
+      applySymbol(
+        to: label,
+        index: index,
+        shortSymbols: shortSymbols,
+        fullSymbols: fullSymbols,
+        weekendIndices: weekendIndices
+      )
       addArrangedSubview(label)
     }
   }
@@ -56,5 +83,17 @@ final class WeekdayView: NSStackView {
 private extension WeekdayView {
   enum Constants {
     static let fontSize: Double = FontSizes.regular
+  }
+
+  func applySymbol(
+    to label: TextLabel,
+    index: Int,
+    shortSymbols: [String],
+    fullSymbols: [String],
+    weekendIndices: [Int]
+  ) {
+    label.stringValue = shortSymbols[index]
+    label.alphaValue = weekendIndices.contains(index) ? AlphaLevels.secondary : AlphaLevels.primary
+    label.setAccessibilityLabel(fullSymbols[index])
   }
 }
