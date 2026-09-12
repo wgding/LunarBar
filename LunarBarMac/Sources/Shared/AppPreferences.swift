@@ -59,6 +59,7 @@ enum AppPreferences {
       }
     }
 
+    @MainActor
     static func applyFirstWeekday() {
       SolarCalendarConfig.firstWeekday = firstWeekday.rawValue
     }
