@@ -70,25 +70,24 @@ final class DateGridCell: NSCollectionViewItem {
     return view
   }()
 
-  private let focusRingView: NSView = {
+  private let todayCircleView: NSView = {
     let view = NSView()
     view.wantsLayer = true
     view.isHidden = true
     view.setAccessibilityHidden(true)
 
-    view.layer?.borderWidth = Constants.focusRingBorderWidth
-    view.layer?.cornerRadius = AppDesign.cellCornerRadius
-    view.layer?.cornerCurve = .continuous
+    view.layer?.masksToBounds = true
 
     return view
   }()
 
-  private let holidayView: NSImageView = {
-    let view = NSImageView(image: Constants.holidayViewImage)
-    view.isHidden = true
-    view.setAccessibilityHidden(true)
+  private let holidayView: TextLabel = {
+    let label = TextLabel()
+    label.font = .mediumSystemFont(ofSize: Constants.holidayFontSize)
+    label.setAccessibilityHidden(true)
+    label.isHidden = true
 
-    return view
+    return label
   }()
 }
 
@@ -110,7 +109,8 @@ extension DateGridCell {
     containerView.frame = view.bounds
 
     highlightView.layerBackgroundColor = .highlightedBackground
-    focusRingView.layer?.borderColor = Colors.controlAccent.cgColor
+    todayCircleView.layerBackgroundColor = Colors.systemRed
+    todayCircleView.layer?.cornerRadius = todayCircleView.bounds.width * 0.5
   }
 }
 
@@ -175,24 +175,23 @@ extension DateGridCell {
       lunarLabel.stringValue = Localized.Calendar.chineseNewYearsEve
     }
 
-    // Show the focus ring only for today
+    // Filled red circle for today
     let isDateToday = Calendar.solar.isDate(cellDate, inSameDayAs: currentDate)
-    focusRingView.isHidden = !isDateToday
+    todayCircleView.isHidden = !isDateToday
+    solarLabel.textColor = isDateToday ? Colors.todayLabel : Colors.primaryLabel
+    lunarLabel.textColor = isDateToday ? Colors.todayLabel : Colors.primaryLabel
 
     // Reload event dot views
     eventView.updateEvents(cellEvents)
 
-    // Bookmark for holiday plans
-    switch holidayType {
-    case .none:
+    // Compact workday / holiday badge
+    if let badge = AppLocalizer.holidayBadge(of: holidayType) {
+      holidayView.isHidden = false
+      holidayView.stringValue = badge
+      holidayView.textColor = holidayType == .workday ? Colors.systemOrange : Colors.systemBlue
+    } else {
       holidayView.isHidden = true
-      holidayView.contentTintColor = nil
-    case .workday:
-      holidayView.isHidden = false
-      holidayView.contentTintColor = Colors.systemOrange
-    case .holiday:
-      holidayView.isHidden = false
-      holidayView.contentTintColor = Colors.systemTeal
+      holidayView.stringValue = ""
     }
 
     self.mainInfo = {
@@ -277,14 +276,16 @@ private extension DateGridCell {
   enum Constants {
     static let solarFontSize: Double = FontSizes.regular
     static let lunarFontSize: Double = FontSizes.small
+    static let holidayFontSize: Double = 8
     static let eventViewHeight: Double = 10
-    static let focusRingBorderWidth: Double = 2
-    static let holidayViewImage: NSImage = .with(symbolName: Icons.bookmarkFill, pointSize: 9)
+    static let todayCirclePadding: Double = 5
     static let lunarDateFormatter: DateFormatter = .lunarDate
   }
 
   func setUp() {
     view.addSubview(containerView)
+    view.clipsToBounds = false
+    containerView.clipsToBounds = false
     containerView.addAction { [weak self] in
       self?.revealDateInCalendar()
     }
@@ -295,6 +296,9 @@ private extension DateGridCell {
 
     highlightView.translatesAutoresizingMaskIntoConstraints = false
     containerView.addSubview(highlightView)
+
+    todayCircleView.translatesAutoresizingMaskIntoConstraints = false
+    containerView.addSubview(todayCircleView)
 
     solarLabel.translatesAutoresizingMaskIntoConstraints = false
     containerView.addSubview(solarLabel)
@@ -318,9 +322,14 @@ private extension DateGridCell {
       eventView.heightAnchor.constraint(equalToConstant: Constants.eventViewHeight),
     ])
 
-    focusRingView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.addSubview(focusRingView)
+    let dateLabelsGuide = NSLayoutGuide()
+    containerView.addLayoutGuide(dateLabelsGuide)
     NSLayoutConstraint.activate([
+      dateLabelsGuide.topAnchor.constraint(equalTo: solarLabel.topAnchor),
+      dateLabelsGuide.bottomAnchor.constraint(equalTo: lunarLabel.bottomAnchor),
+      dateLabelsGuide.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+      dateLabelsGuide.widthAnchor.constraint(equalToConstant: 1),
+
       highlightView.topAnchor.constraint(equalTo: containerView.topAnchor),
       highlightView.bottomAnchor.constraint(equalTo: eventView.bottomAnchor, constant: AppDesign.cellRectInset),
       highlightView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
@@ -328,27 +337,35 @@ private extension DateGridCell {
       // Here we need to make sure the highlight view is wider than both labels
       highlightView.widthAnchor.constraint(
         greaterThanOrEqualTo: solarLabel.widthAnchor,
-        constant: Constants.focusRingBorderWidth + AppDesign.cellRectInset * 2
+        constant: AppDesign.cellRectInset * 2
       ),
       highlightView.widthAnchor.constraint(
         greaterThanOrEqualTo: lunarLabel.widthAnchor,
-        constant: Constants.focusRingBorderWidth + AppDesign.cellRectInset * 2
+        constant: AppDesign.cellRectInset * 2
       ),
 
-      // The focus ring has the same frame as the highlight view
-      focusRingView.leadingAnchor.constraint(equalTo: highlightView.leadingAnchor),
-      focusRingView.trailingAnchor.constraint(equalTo: highlightView.trailingAnchor),
-      focusRingView.topAnchor.constraint(equalTo: highlightView.topAnchor),
-      focusRingView.bottomAnchor.constraint(equalTo: highlightView.bottomAnchor),
+      todayCircleView.centerXAnchor.constraint(equalTo: dateLabelsGuide.centerXAnchor),
+      todayCircleView.centerYAnchor.constraint(equalTo: dateLabelsGuide.centerYAnchor),
+      todayCircleView.widthAnchor.constraint(equalTo: todayCircleView.heightAnchor),
+      todayCircleView.heightAnchor.constraint(
+        greaterThanOrEqualTo: dateLabelsGuide.heightAnchor,
+        constant: Constants.todayCirclePadding * 2
+      ),
+      todayCircleView.widthAnchor.constraint(
+        greaterThanOrEqualTo: solarLabel.widthAnchor,
+        constant: Constants.todayCirclePadding * 2
+      ),
+      todayCircleView.widthAnchor.constraint(
+        greaterThanOrEqualTo: lunarLabel.widthAnchor,
+        constant: Constants.todayCirclePadding * 2
+      ),
     ])
 
     holidayView.translatesAutoresizingMaskIntoConstraints = false
     containerView.addSubview(holidayView)
     NSLayoutConstraint.activate([
-      holidayView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: -3.5),
-      holidayView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -1.5),
-      holidayView.widthAnchor.constraint(equalToConstant: holidayView.frame.width),
-      holidayView.heightAnchor.constraint(equalToConstant: holidayView.frame.height),
+      holidayView.bottomAnchor.constraint(equalTo: solarLabel.centerYAnchor, constant: 1),
+      holidayView.leadingAnchor.constraint(equalTo: solarLabel.trailingAnchor, constant: -1),
     ])
 
     let longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))

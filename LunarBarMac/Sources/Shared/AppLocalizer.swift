@@ -37,4 +37,16 @@ enum AppLocalizer {
       return Localized.Calendar.holidayLabel + middleDot
     }
   }
+
+  /// Compact calendar badge, always in Chinese.
+  static func holidayBadge(of type: HolidayType?) -> String? {
+    switch type {
+    case .none:
+      return nil
+    case .workday:
+      return "班"
+    case .holiday:
+      return "休"
+    }
+  }
 }

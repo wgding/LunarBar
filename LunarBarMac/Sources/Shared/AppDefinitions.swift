@@ -195,7 +195,6 @@ enum Localized {
 //
 // Note: double check availability and deployment target before adding new icons
 enum Icons {
-  static let bookmarkFill = "bookmark.fill"
   static let calendar = "calendar"
   static let chevronCompactBackward = "chevron.compact.backward"
   static let chevronCompactForward = "chevron.compact.forward"
@@ -209,8 +208,10 @@ enum Icons {
 enum Colors {
   static let controlAccent: NSColor = .controlAccentColor
   static let primaryLabel: NSColor = .labelColor
-  static let systemTeal: NSColor = .systemTeal
+  static let systemBlue: NSColor = .systemBlue
   static let systemOrange: NSColor = .systemOrange
+  static let systemRed: NSColor = .systemRed
+  static let todayLabel: NSColor = .white
 }
 
 enum FontSizes {
